@@ -1,0 +1,36 @@
+[Unit]
+Description=CrowdStudio - Crowdsourcing Audiovisual Platform
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=crowdstudio
+Group=crowdstudio
+
+# Directorio de trabajo
+WorkingDirectory=/opt/crowdstudio
+
+# Variables de entorno
+Environment="PYTHONUNBUFFERED=1"
+Environment="PYTHONDONTWRITEBYTECODE=1"
+
+# Comando de inicio (usando el Python del venv)
+ExecStart=/opt/crowdstudio/venv/bin/python /opt/crowdstudio/main.py
+
+# Reinicio automático
+Restart=always
+RestartSec=5
+
+# Límites de recursos (ajustables según tu VPS)
+MemoryMax=512M
+CPUQuota=50%
+
+# Seguridad
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/crowdstudio
+
+[Install]
+WantedBy=multi-user.target
