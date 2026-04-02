@@ -5,9 +5,13 @@
 const API_URL = '/api';
 
 // Estado global
+// Obtener token de localStorage, limpiar si es inválido
+const storedToken = localStorage.getItem('token');
+const validToken = storedToken && storedToken !== 'null' && storedToken !== 'undefined' ? storedToken : null;
+
 const state = {
     user: null,
-    token: localStorage.getItem('token'),
+    token: validToken,
     projects: [],
     currentView: 'home',
     selectedProject: null
@@ -44,14 +48,22 @@ function getStatusBadge(status) {
 
 async function api(endpoint, options = {}) {
     const url = `${API_URL}${endpoint}`;
+    
+    // Debug: mostrar si tenemos token
+    console.log('API Call:', endpoint, 'Token:', state.token ? 'Presente' : 'No hay token');
+    
     const config = {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            ...(state.token && { 'Authorization': `Bearer ${state.token}` }),
             ...options.headers
         },
         ...options
     };
+    
+    // Agregar Authorization header si hay token
+    if (state.token) {
+        config.headers['Authorization'] = `Bearer ${state.token}`;
+    }
 
     if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
         const params = new URLSearchParams();
@@ -60,14 +72,22 @@ async function api(endpoint, options = {}) {
         }
         config.body = params.toString();
     }
+    
+    console.log('Request headers:', config.headers);
 
     try {
         const response = await fetch(url, config);
+        console.log('Response status:', response.status);
+        
         if (response.status === 401) {
+            console.error('Error 401: No autenticado');
+            showNotification('Sesión expirada o no válida. Por favor ingresa nuevamente.', 'error');
             logout();
             return null;
         }
+        
         const data = await response.json();
+        
         if (!response.ok) {
             throw new Error(data.detail || 'Error en la petición');
         }
@@ -1193,13 +1213,21 @@ function logout() {
 // ==========================================
 
 async function init() {
+    console.log('App init. Token presente:', !!state.token);
+    
     if (state.token) {
         try {
             const user = await api('/me');
-            state.user = user;
+            if (user) {
+                state.user = user;
+                console.log('Usuario autenticado:', user.full_name);
+            }
         } catch (error) {
+            console.error('Error validando token:', error);
             logout();
         }
+    } else {
+        console.log('No hay token guardado');
     }
     
     // Router simple basado en hash
