@@ -27,6 +27,16 @@ class ContributionStatus(str, enum.Enum):
     VALIDATED = "validated"
     REJECTED = "rejected"
 
+class ResourceCategory(str, enum.Enum):
+    EQUIPMENT = "equipment"
+    LOCATION = "location"
+    SUPPLY = "supply"
+
+class ResourceOfferStatus(str, enum.Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
 class User(Base):
     __tablename__ = "users"
     
@@ -44,6 +54,8 @@ class User(Base):
     donations = relationship("Donation", back_populates="user")
     votes = relationship("Vote", back_populates="user")
     managed_projects = relationship("Project", back_populates="producer")
+    resource_provided = relationship("ResourceNeed", back_populates="provider")
+    resource_offers = relationship("ResourceOffer", back_populates="user")
 
 class Project(Base):
     __tablename__ = "projects"
@@ -63,6 +75,8 @@ class Project(Base):
     producer = relationship("User", back_populates="managed_projects")
     roles = relationship("Role", back_populates="project", cascade="all, delete-orphan")
     donations = relationship("Donation", back_populates="project")
+    resource_needs = relationship("ResourceNeed", back_populates="project", cascade="all, delete-orphan")
+    events = relationship("ProjectEvent", back_populates="project", cascade="all, delete-orphan")
 
 class Role(Base):
     __tablename__ = "roles"
@@ -76,6 +90,7 @@ class Role(Base):
     reference_fee = Column(Float, default=0)
     is_filled = Column(Boolean, default=False)
     assigned_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    requires_experience = Column(Boolean, default=False)
     
     project = relationship("Project", back_populates="roles")
     assigned_user = relationship("User")
@@ -89,6 +104,7 @@ class Application(Base):
     role_id = Column(Integer, ForeignKey("roles.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
     message = Column(Text)
+    experience_references = Column(Text, nullable=True)
     status = Column(Enum(ApplicationStatus), default=ApplicationStatus.PENDING)
     created_at = Column(DateTime, default=datetime.utcnow)
     
@@ -122,6 +138,48 @@ class Donation(Base):
     
     user = relationship("User", back_populates="donations")
     project = relationship("Project", back_populates="donations")
+
+class ResourceNeed(Base):
+    __tablename__ = "resource_needs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    category = Column(Enum(ResourceCategory))
+    title = Column(String)
+    description = Column(Text)
+    is_filled = Column(Boolean, default=False)
+    provider_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    project = relationship("Project", back_populates="resource_needs")
+    provider = relationship("User", back_populates="resource_provided")
+    offers = relationship("ResourceOffer", back_populates="resource_need", cascade="all, delete-orphan")
+
+class ResourceOffer(Base):
+    __tablename__ = "resource_offers"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    resource_need_id = Column(Integer, ForeignKey("resource_needs.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    message = Column(Text)
+    status = Column(Enum(ResourceOfferStatus), default=ResourceOfferStatus.PENDING)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    resource_need = relationship("ResourceNeed", back_populates="offers")
+    user = relationship("User", back_populates="resource_offers")
+
+class ProjectEvent(Base):
+    __tablename__ = "project_events"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    title = Column(String)
+    description = Column(Text)
+    event_date = Column(DateTime)
+    related_role_title = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    project = relationship("Project", back_populates="events")
 
 class Voting(Base):
     __tablename__ = "votings"

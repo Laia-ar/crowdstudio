@@ -11,10 +11,12 @@ from contextlib import asynccontextmanager
 import json
 import os
 import bcrypt
+from collections import defaultdict
 
 from database import engine, get_db
 from models import Base, User, Project, Role, Application, Contribution, Donation, Voting, Vote
-from models import UserRole, ProjectStatus, ApplicationStatus, ContributionStatus
+from models import ResourceNeed, ResourceOffer, ProjectEvent
+from models import UserRole, ProjectStatus, ApplicationStatus, ContributionStatus, ResourceCategory, ResourceOfferStatus
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,17 +30,33 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Crowdsourcing Audiovisual", lifespan=lifespan)
 
+# Rate limiting básico en memoria para auth endpoints
+_rate_limit_store = defaultdict(list)
+RATE_LIMIT_MAX = 10  # requests
+RATE_LIMIT_WINDOW = 60  # segundos
+
+def _check_rate_limit(client_ip: str) -> bool:
+    now = datetime.utcnow()
+    window_start = now - timedelta(seconds=RATE_LIMIT_WINDOW)
+    _rate_limit_store[client_ip] = [t for t in _rate_limit_store[client_ip] if t > window_start]
+    if len(_rate_limit_store[client_ip]) >= RATE_LIMIT_MAX:
+        return False
+    _rate_limit_store[client_ip].append(now)
+    return True
+
 # Configuración de seguridad
-SECRET_KEY = "your-secret-key-change-in-production"
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 día
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
-# CORS - permitir todas las origins para desarrollo
+# CORS - configurable por entorno
+_cors_origins = os.environ.get("CORS_ORIGINS", "*")
+allow_origins = [o.strip() for o in _cors_origins.split(",")] if _cors_origins != "*" else ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -110,12 +128,59 @@ def get_or_create_admin(db: Session):
         db.refresh(admin)
     return admin
 
+def is_community_member(db: Session, user_id: int, project_id: int = None) -> bool:
+    """Devuelve True si el usuario es miembro de la comunidad.
+    Si project_id se proporciona, verifica membresía en ese proyecto específico.
+    Membresía = rol aceptado en cualquier proyecto, o donación, o recurso aceptado.
+    """
+    # Admin siempre es miembro
+    user = db.query(User).filter(User.id == user_id).first()
+    if user and user.role == UserRole.ADMIN:
+        return True
+    
+    if project_id:
+        # Verificar rol aceptado en este proyecto
+        has_accepted_role = db.query(Role).filter(
+            Role.project_id == project_id,
+            Role.assigned_user_id == user_id
+        ).first() is not None
+        
+        has_donation = db.query(Donation).filter(
+            Donation.project_id == project_id,
+            Donation.user_id == user_id
+        ).first() is not None
+        
+        has_resource = db.query(ResourceNeed).filter(
+            ResourceNeed.project_id == project_id,
+            ResourceNeed.provider_user_id == user_id
+        ).first() is not None
+        
+        return has_accepted_role or has_donation or has_resource
+    else:
+        # Verificar en cualquier proyecto
+        has_accepted_role = db.query(Application).filter(
+            Application.user_id == user_id,
+            Application.status == ApplicationStatus.ACCEPTED
+        ).first() is not None
+        
+        has_donation = db.query(Donation).filter(
+            Donation.user_id == user_id
+        ).first() is not None
+        
+        has_resource = db.query(ResourceNeed).filter(
+            ResourceNeed.provider_user_id == user_id
+        ).first() is not None
+        
+        return has_accepted_role or has_donation or has_resource
 
 
 # ============ RUTAS DE AUTENTICACIÓN ============
 
 @app.post("/api/register")
-def register(email: str = Form(...), password: str = Form(...), full_name: str = Form(...), db: Session = Depends(get_db)):
+def register(request: Request, email: str = Form(...), password: str = Form(...), full_name: str = Form(...), db: Session = Depends(get_db)):
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip):
+        raise HTTPException(status_code=429, detail="Too many requests. Please try again later.")
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -132,7 +197,10 @@ def register(email: str = Form(...), password: str = Form(...), full_name: str =
     return {"message": "User created successfully", "user_id": user.id}
 
 @app.post("/api/token")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip):
+        raise HTTPException(status_code=429, detail="Too many requests. Please try again later.")
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -157,13 +225,14 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     }
 
 @app.get("/api/me")
-def get_me(current_user: User = Depends(get_current_user)):
+def get_me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return {
         "id": current_user.id,
         "email": current_user.email,
         "full_name": current_user.full_name,
         "role": current_user.role.value,
-        "bio": current_user.bio
+        "bio": current_user.bio,
+        "is_community_member": is_community_member(db, current_user.id)
     }
 
 # ============ RUTAS PÚBLICAS (VISITANTE) ============
@@ -214,7 +283,8 @@ def get_public_project(project_id: int, db: Session = Depends(get_db)):
             "description": r.description,
             "tasks": r.tasks,
             "reference_fee": r.reference_fee,
-            "is_filled": r.is_filled
+            "is_filled": r.is_filled,
+            "requires_experience": r.requires_experience
         })
     
     return {
@@ -253,17 +323,7 @@ def get_projects(db: Session = Depends(get_db), current_user: User = Depends(get
                 "has_applied": has_applied
             })
         
-        # Verificar si el usuario es miembro (tiene aportes validados)
-        is_member = db.query(Contribution).filter(
-            Contribution.user_id == current_user.id,
-            Contribution.status == ContributionStatus.VALIDATED
-        ).first() is not None
-        
-        # O tiene donaciones
-        if not is_member:
-            is_member = db.query(Donation).filter(
-                Donation.user_id == current_user.id
-            ).first() is not None
+        is_member = is_community_member(db, current_user.id, p.id)
         
         result.append({
             "id": p.id,
@@ -272,7 +332,7 @@ def get_projects(db: Session = Depends(get_db), current_user: User = Depends(get
             "type": p.type,
             "status": p.status.value,
             "roles": roles_info,
-            "is_member": is_member or (current_user.role == UserRole.MEMBER)
+            "is_member": is_member
         })
     return result
 
@@ -312,6 +372,7 @@ def create_role(
     tasks: str = Form(...),
     deliverables: str = Form(""),
     reference_fee: float = Form(0),
+    requires_experience: bool = Form(False),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -330,7 +391,8 @@ def create_role(
         tasks=tasks,
         deliverables=deliverables,
         reference_fee=reference_fee,
-        is_filled=False
+        is_filled=False,
+        requires_experience=requires_experience
     )
     db.add(role)
     db.commit()
@@ -343,6 +405,7 @@ def create_role(
 def apply_to_role(
     role_id: int,
     message: str = Form(...),
+    experience_references: str = Form(""),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -362,10 +425,14 @@ def apply_to_role(
     if existing:
         raise HTTPException(status_code=400, detail="Already applied to this role")
     
+    if role.requires_experience and not experience_references.strip():
+        raise HTTPException(status_code=400, detail="Experience references are required for this role")
+    
     application = Application(
         role_id=role_id,
         user_id=current_user.id,
         message=message,
+        experience_references=experience_references or None,
         status=ApplicationStatus.PENDING
     )
     db.add(application)
@@ -400,6 +467,7 @@ def get_project_applications(
             "user_email": app.user.email,
             "user_bio": app.user.bio,
             "message": app.message,
+            "experience_references": app.experience_references,
             "status": app.status.value,
             "created_at": app.created_at.isoformat()
         })
@@ -630,6 +698,177 @@ def replace_member(
     db.commit()
     return {"message": "Member replaced successfully"}
 
+# ============ NECESIDADES DE RECURSOS (Equipos, Insumos, Locaciones) ============
+
+@app.post("/api/projects/{project_id}/resources")
+def create_resource_need(
+    project_id: int,
+    category: str = Form(...),
+    title: str = Form(...),
+    description: str = Form(""),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Crear una necesidad de recurso dentro de un proyecto (solo admin/productor)"""
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    if current_user.role != UserRole.ADMIN and project.producer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    try:
+        cat_enum = ResourceCategory(category)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid category. Use equipment, location or supply")
+    
+    resource = ResourceNeed(
+        project_id=project_id,
+        category=cat_enum,
+        title=title,
+        description=description,
+        is_filled=False
+    )
+    db.add(resource)
+    db.commit()
+    db.refresh(resource)
+    return {"message": "Resource need created", "resource_id": resource.id}
+
+@app.get("/api/projects/{project_id}/resources")
+def get_project_resources(
+    project_id: int,
+    db: Session = Depends(get_db)
+):
+    """Listar necesidades de recursos de un proyecto"""
+    resources = db.query(ResourceNeed).filter(
+        ResourceNeed.project_id == project_id
+    ).options(joinedload(ResourceNeed.provider)).all()
+    
+    result = []
+    for r in resources:
+        result.append({
+            "id": r.id,
+            "category": r.category.value,
+            "title": r.title,
+            "description": r.description,
+            "is_filled": r.is_filled,
+            "provider_name": r.provider.full_name if r.provider else None
+        })
+    return result
+
+@app.post("/api/resources/{resource_id}/offer")
+def offer_resource(
+    resource_id: int,
+    message: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Ofrecer un recurso para una necesidad del proyecto"""
+    resource = db.query(ResourceNeed).filter(ResourceNeed.id == resource_id).first()
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource need not found")
+    
+    if resource.is_filled:
+        raise HTTPException(status_code=400, detail="This resource need is already filled")
+    
+    existing = db.query(ResourceOffer).filter(
+        ResourceOffer.resource_need_id == resource_id,
+        ResourceOffer.user_id == current_user.id
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Already offered for this resource")
+    
+    offer = ResourceOffer(
+        resource_need_id=resource_id,
+        user_id=current_user.id,
+        message=message,
+        status=ResourceOfferStatus.PENDING
+    )
+    db.add(offer)
+    db.commit()
+    return {"message": "Resource offer submitted successfully"}
+
+@app.get("/api/resources/{resource_id}/offers")
+def get_resource_offers(
+    resource_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Ver ofertas de un recurso (solo admin/productor del proyecto)"""
+    resource = db.query(ResourceNeed).filter(ResourceNeed.id == resource_id).options(
+        joinedload(ResourceNeed.project)
+    ).first()
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource need not found")
+    
+    if current_user.role != UserRole.ADMIN and resource.project.producer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    offers = db.query(ResourceOffer).filter(
+        ResourceOffer.resource_need_id == resource_id
+    ).options(joinedload(ResourceOffer.user)).all()
+    
+    result = []
+    for o in offers:
+        result.append({
+            "id": o.id,
+            "user_name": o.user.full_name,
+            "user_email": o.user.email,
+            "message": o.message,
+            "status": o.status.value,
+            "created_at": o.created_at.isoformat()
+        })
+    return result
+
+@app.post("/api/resources/{resource_id}/respond")
+def respond_resource_offer(
+    resource_id: int,
+    offer_id: int = Form(...),
+    accept: bool = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Aceptar o rechazar una oferta de recurso"""
+    resource = db.query(ResourceNeed).filter(ResourceNeed.id == resource_id).options(
+        joinedload(ResourceNeed.project)
+    ).first()
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource need not found")
+    
+    if current_user.role != UserRole.ADMIN and resource.project.producer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    offer = db.query(ResourceOffer).filter(
+        ResourceOffer.id == offer_id,
+        ResourceOffer.resource_need_id == resource_id
+    ).first()
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer not found")
+    
+    if accept:
+        offer.status = ResourceOfferStatus.ACCEPTED
+        resource.is_filled = True
+        resource.provider_user_id = offer.user_id
+        
+        # Rechazar otras ofertas pendientes
+        other_offers = db.query(ResourceOffer).filter(
+            ResourceOffer.resource_need_id == resource_id,
+            ResourceOffer.id != offer_id,
+            ResourceOffer.status == ResourceOfferStatus.PENDING
+        ).all()
+        for oo in other_offers:
+            oo.status = ResourceOfferStatus.REJECTED
+        
+        # Convertir proveedor en miembro
+        user = db.query(User).filter(User.id == offer.user_id).first()
+        if user and user.role == UserRole.USER:
+            user.role = UserRole.MEMBER
+    else:
+        offer.status = ResourceOfferStatus.REJECTED
+    
+    db.commit()
+    return {"message": "Resource offer " + ("accepted" if accept else "rejected")}
+
 # ============ APORTES ECONÓMICOS ============
 
 @app.post("/api/projects/{project_id}/donate")
@@ -680,6 +919,94 @@ def get_project_donations(
         })
     
     return {"donations": result, "total": total}
+
+# ============ AGENDA DEL PROYECTO ============
+
+@app.post("/api/projects/{project_id}/events")
+def create_project_event(
+    project_id: int,
+    title: str = Form(...),
+    description: str = Form(""),
+    event_date: str = Form(...),  # ISO format
+    related_role_title: str = Form(""),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Crear un evento en la agenda del proyecto (solo admin/productor)"""
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    if current_user.role != UserRole.ADMIN and project.producer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    try:
+        parsed_date = datetime.fromisoformat(event_date.replace('Z', '+00:00'))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use ISO 8601")
+    
+    event = ProjectEvent(
+        project_id=project_id,
+        title=title,
+        description=description,
+        event_date=parsed_date,
+        related_role_title=related_role_title or None
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+    return {"message": "Event created", "event_id": event.id}
+
+@app.get("/api/projects/{project_id}/events")
+def get_project_events(
+    project_id: int,
+    db: Session = Depends(get_db)
+):
+    """Listar eventos de un proyecto (futuros primero, luego pasados recientes)"""
+    now = datetime.utcnow()
+    
+    future = db.query(ProjectEvent).filter(
+        ProjectEvent.project_id == project_id,
+        ProjectEvent.event_date >= now
+    ).order_by(ProjectEvent.event_date.asc()).all()
+    
+    past = db.query(ProjectEvent).filter(
+        ProjectEvent.project_id == project_id,
+        ProjectEvent.event_date < now
+    ).order_by(ProjectEvent.event_date.desc()).limit(5).all()
+    
+    events = future + past
+    
+    result = []
+    for e in events:
+        result.append({
+            "id": e.id,
+            "title": e.title,
+            "description": e.description,
+            "event_date": e.event_date.isoformat(),
+            "related_role_title": e.related_role_title
+        })
+    return result
+
+@app.delete("/api/events/{event_id}")
+def delete_project_event(
+    event_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Eliminar un evento de la agenda"""
+    event = db.query(ProjectEvent).filter(ProjectEvent.id == event_id).options(
+        joinedload(ProjectEvent.project)
+    ).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    if current_user.role != UserRole.ADMIN and event.project.producer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    db.delete(event)
+    db.commit()
+    return {"message": "Event deleted"}
 
 # ============ DISTRIBUCIÓN ECONÓMICA Y VOTACIONES ============
 
@@ -746,6 +1073,37 @@ def get_distribution(
         "contributors": contributors
     }
 
+@app.get("/api/projects/{project_id}/votings")
+def get_project_votings(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Listar votaciones de un proyecto"""
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    votings = db.query(Voting).filter(Voting.project_id == project_id).all()
+    
+    result = []
+    for v in votings:
+        has_voted = db.query(Vote).filter(
+            Vote.voting_id == v.id,
+            Vote.user_id == current_user.id
+        ).first() is not None
+        
+        result.append({
+            "id": v.id,
+            "title": v.title,
+            "description": v.description,
+            "status": v.status,
+            "options": json.loads(v.options),
+            "has_voted": has_voted,
+            "created_at": v.created_at.isoformat()
+        })
+    return result
+
 @app.post("/api/projects/{project_id}/votings")
 def create_voting(
     project_id: int,
@@ -784,7 +1142,7 @@ def cast_vote(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Votar en una votación (solo quienes hicieron aportes económicos)"""
+    """Votar en una votación (solo miembros del proyecto)"""
     voting = db.query(Voting).filter(Voting.id == voting_id).first()
     if not voting:
         raise HTTPException(status_code=404, detail="Voting not found")
@@ -792,14 +1150,9 @@ def cast_vote(
     if voting.status != "open":
         raise HTTPException(status_code=400, detail="Voting is closed")
     
-    # Verificar que el usuario hizo aportes económicos
-    donations = db.query(Donation).filter(
-        Donation.user_id == current_user.id,
-        Donation.project_id == voting.project_id
-    ).all()
-    
-    if not donations:
-        raise HTTPException(status_code=403, detail="Only donors can vote")
+    # Verificar que el usuario sea miembro de la comunidad de este proyecto
+    if not is_community_member(db, current_user.id, voting.project_id):
+        raise HTTPException(status_code=403, detail="Only community members of this project can vote")
     
     # Verificar que no haya votado ya
     existing = db.query(Vote).filter(

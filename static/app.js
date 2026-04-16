@@ -153,8 +153,8 @@ function renderHome() {
         <div class="hero">
             <div class="container">
                 <h1>Crea cine, series y arte juntos</h1>
-                <p>Una plataforma donde creadores, técnicos y mecenas colaboran en proyectos audiovisuales. 
-                   Gana por tu trabajo y participa en las decisiones de la comunidad.</p>
+                <p>Una productora audiovisual descentralizada donde la comunidad decide, aprende y construye obras colectivamente. 
+                   Tu voz cuenta y tu voto decide.</p>
                 <button class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 2rem;" 
                         onclick="navigateTo('projects')">
                     Explorar Proyectos
@@ -169,21 +169,24 @@ function renderHome() {
             </div>
         </div>
         
-        <div class="section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-            <div class="card" style="text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🎭</div>
-                <h3>Participa en Proyectos</h3>
-                <p>Postúlate a roles según tus habilidades: dirección, fotografía, sonido, actuación, producción y más.</p>
-            </div>
-            <div class="card" style="text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
-                <h3>Apoya Económicamente</h3>
-                <p>Contribuye como mecenas y participa en las votaciones sobre el uso de los recursos.</p>
-            </div>
-            <div class="card" style="text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div>
-                <h3>Gana por tu Trabajo</h3>
-                <p>Recibe compensación justa cuando las obras se comercialicen. Todo queda registrado.</p>
+        <div class="section">
+            <h2 class="section-title" style="text-align: center;">Crear colectivamente significa...</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🗳️</div>
+                    <h3>Participar en las decisiones</h3>
+                    <p>Desde el guión hasta el destino de los excedentes: profesionales y mecenas tienen el mismo derecho de voto.</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
+                    <h3>Aprender del proceso</h3>
+                    <p>Accedé a las reuniones de cada área, curioseá cómo se construye una obra y formate en el camino.</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🤝</div>
+                    <h3>Ser dueño de lo creado</h3>
+                    <p>Aportá tu trabajo, equipos o recursos y recibí compensación justa cuando el proyecto se comercialice.</p>
+                </div>
             </div>
         </div>
     `);
@@ -195,35 +198,26 @@ function renderHowItWorks() {
             <h1 class="section-title">Cómo funciona CrowdStudio</h1>
             
             <div class="card" style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">🎬 1. Proyectos Culturales</h3>
-                <p>Los administradores crean proyectos (películas, documentales, series, libros, canciones) con:</p>
-                <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                    <li>Presupuesto teórico y objetivos por etapa</li>
-                    <li>Roles necesarios con tareas y entregables definidos</li>
-                    <li>Honorarios de referencia para cada rol</li>
-                </ul>
+                <h3 style="margin-bottom: 1rem;">🎬 1. Proyectos culturales abiertos</h3>
+                <p>Se proponen proyectos (películas, documentales, series, libros, canciones) con objetivos claros, presupuesto teórico y roles necesarios. El guión y las decisiones clave salen de la comunidad.</p>
             </div>
             
             <div class="card" style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">👥 2. Participación</h3>
-                <p><strong>Como profesional:</strong> Te postulas a los roles que se ajusten a tus habilidades. 
-                Los productores evalúan y asignan. Una vez aceptado, te conviertes en miembro de la comunidad.</p>
-                <p style="margin-top: 1rem;"><strong>Como mecenas:</strong> Haces aportes económicos voluntarios para apoyar proyectos. 
-                También te conviertes en miembro con derecho a voto.</p>
+                <h3 style="margin-bottom: 1rem;">👥 2. Participación como profesional o mecenas</h3>
+                <p><strong>Tu voz cuenta y tu voto decide.</strong> Podés sumarte aportando horas de trabajo, equipos, locaciones o recursos económicos. Todos los aportes validados te convierten en miembro con derecho a voto en ese proyecto.</p>
             </div>
             
             <div class="card" style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">✅ 3. Validación de Trabajo</h3>
-                <p>Registras tus horas y entregables. Los productores validan tu contribución. 
-                Si no cumples, pueden darte advertencias o reemplazarte para proteger el proyecto.</p>
+                <h3 style="margin-bottom: 1rem;">🎓 3. Espacios de trabajo por área + instancias presenciales</h3>
+                <p>Cada rubro creativo y técnico tiene su espacio de trabajo virtual y una agenda abierta. La comunidad puede curiosear reuniones, aprender del proceso y participar en encuentros presenciales cuando el proyecto lo permita.</p>
             </div>
             
             <div class="card" style="margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">💵 4. Distribución Económica</h3>
+                <h3 style="margin-bottom: 1rem;">💵 4. Distribución económica transparente</h3>
                 <p>Cuando el proyecto se comercializa:</p>
                 <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                    <li><strong>Paso 1:</strong> Se paga a quienes trabajaron según contribuciones auditadas</li>
-                    <li><strong>Paso 2:</strong> Si hay excedente, los mecenas votan su destino:
+                    <li><strong>Paso 1:</strong> Se compensa a quienes trabajaron según contribuciones auditadas.</li>
+                    <li><strong>Paso 2:</strong> Si hay excedente, la comunidad vota su destino:
                         <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
                             <li>Nuevos proyectos</li>
                             <li>Sostenimiento de la comunidad</li>
@@ -232,6 +226,11 @@ function renderHowItWorks() {
                         </ul>
                     </li>
                 </ul>
+            </div>
+            
+            <div class="card" style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;">
+                <h3 style="margin-bottom: 1rem;">¿Quiénes forman la comunidad?</h3>
+                <p>Profesionales y mecenas con el <strong>mismo derecho de participación y voto</strong>. Ser miembro no es solo registrarse: significa que hiciste un aporte concreto a un proyecto y que tus decisiones cuentan.</p>
             </div>
         </div>
     `);
@@ -444,7 +443,8 @@ async function handleCreateRole(e, projectId) {
                 description: form.description.value,
                 tasks: form.tasks.value,
                 deliverables: form.deliverables.value,
-                reference_fee: form.reference_fee.value
+                reference_fee: form.reference_fee.value,
+                requires_experience: form.requires_experience.checked
             }
         });
         
@@ -461,9 +461,14 @@ async function handleApply(e, roleId) {
     const form = e.target;
     
     try {
+        const body = { message: form.message.value };
+        if (form.experience_references) {
+            body.experience_references = form.experience_references.value;
+        }
+        
         const data = await api(`/roles/${roleId}/apply`, {
             method: 'POST',
-            body: { message: form.message.value }
+            body: body
         });
         
         closeModal();
@@ -570,12 +575,27 @@ async function loadProjects() {
 
 async function loadProjectDetail(projectId) {
     try {
-        const project = await api(state.token ? `/projects/${projectId}/public` : `/projects/${projectId}/public`);
+        const project = await api(`/projects/${projectId}/public`);
+        
+        // Cargar datos adicionales en paralelo
+        let resources = [];
+        let events = [];
+        let votings = [];
+        
+        try {
+            [resources, events, votings] = await Promise.all([
+                api(`/projects/${projectId}/resources`).catch(() => []),
+                api(`/projects/${projectId}/events`).catch(() => []),
+                state.token ? api(`/projects/${projectId}/votings`).catch(() => []) : Promise.resolve([])
+            ]);
+        } catch (e) {
+            console.error('Error cargando datos secundarios:', e);
+        }
+        
         const container = document.getElementById('project-detail');
         if (!container) return;
         
         const isAdmin = state.user?.role === 'admin';
-        const isProducer = false; // Simplificar - verificar en backend
         
         let html = `
             <div class="card">
@@ -607,6 +627,9 @@ async function loadProjectDetail(projectId) {
                         <button class="btn btn-secondary" onclick="showContributions(${project.id})">
                             Ver Contribuciones
                         </button>
+                        <button class="btn btn-secondary" onclick="showVotings(${project.id})">
+                            Ver Votaciones
+                        </button>
                         <button class="btn btn-warning" onclick="showCompleteModal(${project.id})">
                             Comercializar
                         </button>
@@ -617,7 +640,7 @@ async function loadProjectDetail(projectId) {
             <div class="card">
                 <h3 style="margin-bottom: 1rem;">Roles Necesarios</h3>
                 <div style="display: grid; gap: 1rem;">
-                    ${project.roles.map(r => `
+                    ${project.roles.length === 0 ? '<p style="color: var(--gray-600);">Aún no se han definido roles para este proyecto.</p>' : project.roles.map(r => `
                         <div style="padding: 1rem; background: var(--gray-100); border-radius: 0.5rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start;">
                                 <div>
@@ -625,11 +648,12 @@ async function loadProjectDetail(projectId) {
                                     <p style="font-size: 0.875rem; color: var(--gray-600);">${r.description || ''}</p>
                                     ${r.tasks ? `<p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>Tareas:</strong> ${r.tasks}</p>` : ''}
                                     ${r.reference_fee > 0 ? `<p style="font-size: 0.875rem; color: var(--primary);"><strong>Honorario referencia:</strong> ${formatCurrency(r.reference_fee)}</p>` : ''}
+                                    ${r.requires_experience ? `<p style="font-size: 0.875rem; color: var(--warning);"><strong>⚠ Requiere experiencia comprobable</strong></p>` : ''}
                                 </div>
                                 ${r.is_filled 
                                     ? '<span class="badge badge-accepted">Asignado</span>'
                                     : state.token 
-                                        ? `<button class="btn btn-primary btn-sm" onclick="showApplyModal(${r.id}, '${r.title}')">Postularme</button>`
+                                        ? `<button class="btn btn-primary btn-sm" onclick="showApplyModal(${r.id}, '${r.title.replace(/'/g, "\\'")}', ${r.requires_experience || false})">Postularme</button>`
                                         : '<span class="badge badge-pending">Regístrate para postularte</span>'
                                 }
                             </div>
@@ -637,6 +661,86 @@ async function loadProjectDetail(projectId) {
                     `).join('')}
                 </div>
             </div>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">Equipos, Insumos y Locaciones</h3>
+                ${isAdmin ? `
+                    <div style="margin-bottom: 1rem;">
+                        <button class="btn btn-primary btn-sm" onclick="showAddResourceModal(${project.id})">+ Agregar Necesidad</button>
+                    </div>
+                ` : ''}
+                <div style="display: grid; gap: 1rem;">
+                    ${resources.length === 0 ? '<p style="color: var(--gray-600);">Aún no se han solicitado equipos, insumos o locaciones.</p>' : resources.map(res => `
+                        <div style="padding: 1rem; background: var(--gray-100); border-radius: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <h4 style="margin-bottom: 0.25rem;">${res.title}</h4>
+                                    <span class="badge badge-open" style="margin-bottom: 0.5rem; display: inline-block;">${res.category === 'equipment' ? 'Equipo' : res.category === 'location' ? 'Locación' : 'Insumo'}</span>
+                                    <p style="font-size: 0.875rem; color: var(--gray-600);">${res.description || ''}</p>
+                                    ${res.provider_name ? `<p style="font-size: 0.875rem; color: var(--primary); margin-top: 0.5rem;"><strong>Aportado por:</strong> ${res.provider_name}</p>` : ''}
+                                </div>
+                                ${res.is_filled 
+                                    ? '<span class="badge badge-accepted">Cuberto</span>'
+                                    : state.token 
+                                        ? `<button class="btn btn-primary btn-sm" onclick="showOfferResourceModal(${res.id}, '${res.title.replace(/'/g, "\\'")}')">Ofrecer</button>`
+                                        : '<span class="badge badge-pending">Regístrate para ofrecer</span>'
+                                }
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">Agenda del Proyecto</h3>
+                ${isAdmin ? `
+                    <div style="margin-bottom: 1rem;">
+                        <button class="btn btn-primary btn-sm" onclick="showAddEventModal(${project.id})">+ Agendar Reunión</button>
+                    </div>
+                ` : ''}
+                <div style="display: grid; gap: 1rem;">
+                    ${events.length === 0 ? '<p style="color: var(--gray-600);">No hay eventos programados aún.</p>' : events.map(ev => `
+                        <div style="padding: 1rem; background: var(--gray-100); border-radius: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <h4 style="margin-bottom: 0.25rem;">${ev.title}</h4>
+                                    <p style="font-size: 0.875rem; color: var(--primary); margin-bottom: 0.25rem;">
+                                        <strong>${formatDate(ev.event_date)}</strong> — ${new Date(ev.event_date).toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}
+                                    </p>
+                                    ${ev.related_role_title ? `<p style="font-size: 0.875rem; color: var(--gray-600);">Área: ${ev.related_role_title}</p>` : ''}
+                                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.5rem;">${ev.description || ''}</p>
+                                </div>
+                                ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteEvent(${ev.id}, ${project.id})">Eliminar</button>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            ${state.token ? `
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem;">Votaciones del Proyecto</h3>
+                    <div style="display: grid; gap: 1rem;">
+                        ${votings.length === 0 ? '<p style="color: var(--gray-600);">No hay votaciones activas en este proyecto.</p>' : votings.map(v => `
+                            <div style="padding: 1rem; background: var(--gray-100); border-radius: 0.5rem;">
+                                <h4 style="margin-bottom: 0.5rem;">${v.title}</h4>
+                                <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 1rem;">${v.description || ''}</p>
+                                ${v.status === 'open' && !v.has_voted ? `
+                                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        ${v.options.map((opt, idx) => `
+                                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem;">
+                                                <input type="radio" name="vote_option_${v.id}" value="${idx}" style="width: auto;">
+                                                ${opt}
+                                            </label>
+                                        `).join('')}
+                                        <button class="btn btn-primary btn-sm" style="margin-top: 0.5rem; align-self: flex-start;" onclick="castProjectVote(${v.id}, ${project.id})">Votar</button>
+                                    </div>
+                                ` : v.has_voted ? '<span class="badge badge-accepted">Ya votaste</span>' : '<span class="badge badge-pending">Cerrada</span>'}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
         `;
         
         if (state.token) {
@@ -772,6 +876,10 @@ function showAddRoleModal(projectId) {
                         <label>Honorario de Referencia ($)</label>
                         <input type="number" name="reference_fee" class="form-control" value="0" step="0.01">
                     </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="requires_experience" id="requires_experience" value="true" style="width: auto;">
+                        <label for="requires_experience" style="margin: 0; font-weight: normal;">Requiere experiencia comprobable</label>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -783,7 +891,7 @@ function showAddRoleModal(projectId) {
     document.body.appendChild(modal);
 }
 
-function showApplyModal(roleId, roleTitle) {
+function showApplyModal(roleId, roleTitle, requiresExperience = false) {
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.innerHTML = `
@@ -799,6 +907,13 @@ function showApplyModal(roleId, roleTitle) {
                         <textarea name="message" class="form-control" required rows="5" 
                             placeholder="Cuéntanos por qué eres la persona ideal para este rol..."></textarea>
                     </div>
+                    ${requiresExperience ? `
+                    <div class="form-group">
+                        <label>Referencias / Links de trabajos previos <span style="color: var(--danger);">*</span></label>
+                        <textarea name="experience_references" class="form-control" required rows="3" 
+                            placeholder="Compartí links a trabajos anteriores, portfolio, etc."></textarea>
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -859,6 +974,7 @@ async function showApplications(projectId) {
                                     <th>Rol</th>
                                     <th>Postulante</th>
                                     <th>Mensaje</th>
+                                    <th>Referencias</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -872,6 +988,7 @@ async function showApplications(projectId) {
                                             <small style="color: var(--gray-600);">${app.user_email}</small>
                                         </td>
                                         <td style="max-width: 200px;"><small>${app.message}</small></td>
+                                        <td style="max-width: 200px;">${app.experience_references ? `<small>${app.experience_references}</small>` : '-'}</td>
                                         <td>${getStatusBadge(app.status)}</td>
                                         <td>
                                             ${app.status === 'pending' ? `
@@ -946,6 +1063,362 @@ async function showContributions(projectId) {
             </div>
         `;
         document.body.appendChild(modal);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function showAddResourceModal(projectId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Agregar Equipo, Insumo o Locación</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form onsubmit="handleCreateResource(event, ${projectId})">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select name="category" class="form-control" required>
+                            <option value="equipment">Equipo técnico</option>
+                            <option value="location">Locación / Espacio</option>
+                            <option value="supply">Insumo / Material</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" name="title" class="form-control" required placeholder="Ej: Cámara DSLR, Fábrica en CABA, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea name="description" class="form-control" placeholder="Detalles de lo que se necesita..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function handleCreateResource(e, projectId) {
+    e.preventDefault();
+    const form = e.target;
+    try {
+        await api(`/projects/${projectId}/resources`, {
+            method: 'POST',
+            body: {
+                category: form.category.value,
+                title: form.title.value,
+                description: form.description.value
+            }
+        });
+        closeModal();
+        showNotification('Recurso agregado correctamente', 'success');
+        loadProjectDetail(projectId);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function showOfferResourceModal(resourceId, resourceTitle) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Ofrecer: ${resourceTitle}</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form onsubmit="handleOfferResource(event, ${resourceId})">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Mensaje para el productor</label>
+                        <textarea name="message" class="form-control" required rows="4" 
+                            placeholder="Describí qué podés aportar y en qué condiciones..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Enviar Oferta</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function handleOfferResource(e, resourceId) {
+    e.preventDefault();
+    const form = e.target;
+    try {
+        await api(`/resources/${resourceId}/offer`, {
+            method: 'POST',
+            body: { message: form.message.value }
+        });
+        closeModal();
+        showNotification('Oferta enviada correctamente', 'success');
+        // Recargar la vista actual si estamos en un proyecto
+        const hash = window.location.hash.slice(1);
+        const [view, projectId] = hash.split('/');
+        if (view === 'project' && projectId) {
+            loadProjectDetail(parseInt(projectId));
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function showResourceOffers(resourceId) {
+    try {
+        const offers = await api(`/resources/${resourceId}/offers`);
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3>Ofertas recibidas</h3>
+                    <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body">
+                    ${offers.length === 0 ? '<p>No hay ofertas aún.</p>' : `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Postulante</th>
+                                    <th>Mensaje</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${offers.map(o => `
+                                    <tr>
+                                        <td>${o.user_name}<br><small style="color: var(--gray-600);">${o.user_email}</small></td>
+                                        <td style="max-width: 250px;"><small>${o.message}</small></td>
+                                        <td>${getStatusBadge(o.status)}</td>
+                                        <td>
+                                            ${o.status === 'pending' ? `
+                                                <button class="btn btn-success btn-sm" onclick="respondResourceOffer(${resourceId}, ${o.id}, true)">Aceptar</button>
+                                                <button class="btn btn-danger btn-sm" onclick="respondResourceOffer(${resourceId}, ${o.id}, false)">Rechazar</button>
+                                            ` : '-'}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function respondResourceOffer(resourceId, offerId, accept) {
+    try {
+        await api(`/resources/${resourceId}/respond`, {
+            method: 'POST',
+            body: { offer_id: offerId, accept }
+        });
+        showNotification(accept ? 'Oferta aceptada' : 'Oferta rechazada', 'success');
+        closeModal();
+        const hash = window.location.hash.slice(1);
+        const [view, projectId] = hash.split('/');
+        if (view === 'project' && projectId) {
+            loadProjectDetail(parseInt(projectId));
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function showAddEventModal(projectId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Agendar Reunión / Instancia</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form onsubmit="handleCreateEvent(event, ${projectId})">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" name="title" class="form-control" required placeholder="Ej: Reunión de dirección de arte">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea name="description" class="form-control" placeholder="Detalles de la instancia..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha y hora</label>
+                        <input type="datetime-local" name="event_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Área / Rol relacionado (opcional)</label>
+                        <input type="text" name="related_role_title" class="form-control" placeholder="Ej: Dirección de arte">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agendar</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function handleCreateEvent(e, projectId) {
+    e.preventDefault();
+    const form = e.target;
+    try {
+        const dateValue = new Date(form.event_date.value);
+        await api(`/projects/${projectId}/events`, {
+            method: 'POST',
+            body: {
+                title: form.title.value,
+                description: form.description.value,
+                event_date: dateValue.toISOString(),
+                related_role_title: form.related_role_title.value
+            }
+        });
+        closeModal();
+        showNotification('Evento agendado correctamente', 'success');
+        loadProjectDetail(projectId);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function deleteEvent(eventId, projectId) {
+    if (!confirm('¿Eliminar este evento?')) return;
+    try {
+        await api(`/events/${eventId}`, { method: 'DELETE' });
+        showNotification('Evento eliminado', 'success');
+        loadProjectDetail(projectId);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function castProjectVote(votingId, projectId) {
+    const selected = document.querySelector(`input[name="vote_option_${votingId}"]:checked`);
+    if (!selected) {
+        showNotification('Seleccioná una opción para votar', 'error');
+        return;
+    }
+    try {
+        await api(`/votings/${votingId}/vote`, {
+            method: 'POST',
+            body: { option_index: parseInt(selected.value) }
+        });
+        showNotification('Voto registrado correctamente', 'success');
+        loadProjectDetail(projectId);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function showVotings(projectId) {
+    try {
+        const votings = await api(`/projects/${projectId}/votings`);
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h3>Gestionar Votaciones</h3>
+                    <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 1rem;">
+                        <button class="btn btn-primary btn-sm" onclick="closeModal(); showCreateVotingModal(${projectId});">+ Nueva Votación</button>
+                    </div>
+                    ${votings.length === 0 ? '<p>No hay votaciones creadas aún.</p>' : `
+                        <div style="display: grid; gap: 1rem;">
+                            ${votings.map(v => `
+                                <div style="padding: 1rem; background: var(--gray-100); border-radius: 0.5rem;">
+                                    <h4>${v.title}</h4>
+                                    <p style="font-size: 0.875rem; color: var(--gray-600);">${v.description || ''}</p>
+                                    <p style="font-size: 0.875rem; margin-top: 0.5rem;"><strong>Opciones:</strong> ${v.options.join(', ')}</p>
+                                    <div style="margin-top: 0.5rem;">${getStatusBadge(v.status)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function showCreateVotingModal(projectId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Nueva Votación</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form onsubmit="handleCreateVoting(event, ${projectId})">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea name="description" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Opciones (una por línea)</label>
+                        <textarea name="options" class="form-control" required rows="4" placeholder="Opción A&#10;Opción B&#10;Opción C"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Votación</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function handleCreateVoting(e, projectId) {
+    e.preventDefault();
+    const form = e.target;
+    const options = form.options.value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (options.length < 2) {
+        showNotification('Ingresá al menos 2 opciones', 'error');
+        return;
+    }
+    try {
+        await api(`/projects/${projectId}/votings`, {
+            method: 'POST',
+            body: {
+                title: form.title.value,
+                description: form.description.value,
+                options: JSON.stringify(options)
+            }
+        });
+        closeModal();
+        showNotification('Votación creada correctamente', 'success');
+        loadProjectDetail(projectId);
     } catch (error) {
         console.error(error);
     }
