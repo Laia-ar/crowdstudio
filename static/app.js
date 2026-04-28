@@ -679,11 +679,13 @@ async function loadProjectDetail(projectId) {
                                     <p style="font-size: 0.875rem; color: var(--gray-600);">${res.description || ''}</p>
                                     ${res.provider_name ? `<p style="font-size: 0.875rem; color: var(--primary); margin-top: 0.5rem;"><strong>Aportado por:</strong> ${res.provider_name}</p>` : ''}
                                 </div>
-                                ${res.is_filled 
-                                    ? '<span class="badge badge-accepted">Cuberto</span>'
-                                    : state.token 
-                                        ? `<button class="btn btn-primary btn-sm" onclick="showOfferResourceModal(${res.id}, '${res.title.replace(/'/g, "\\'")}')">Ofrecer</button>`
-                                        : '<span class="badge badge-pending">Regístrate para ofrecer</span>'
+                                ${isAdmin 
+                                    ? `<button class="btn btn-secondary btn-sm" onclick="showResourceOffers(${res.id})">Ver ofertas</button>`
+                                    : res.is_filled 
+                                        ? '<span class="badge badge-accepted">Cuberto</span>'
+                                        : state.token 
+                                            ? `<button class="btn btn-primary btn-sm" onclick="showOfferResourceModal(${res.id}, '${res.title.replace(/'/g, "\\'")}')">Ofrecer</button>`
+                                            : '<span class="badge badge-pending">Regístrate para ofrecer</span>'
                                 }
                             </div>
                         </div>
